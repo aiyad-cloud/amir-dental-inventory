@@ -1,1 +1,239 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123c35">
+<title>Dental Stock Pro | مخزون مستلزمات الأسنان</title>
+<style>
+:root{--g:#123c35;--g2:#1e6556;--bg:#f3f7f5;--line:#dfe8e3;--red:#b42318}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#192b24;font-family:Tahoma,Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:11px 14px;background:var(--g);color:white;font-weight:bold}
+input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:white;min-width:0}
+header{background:linear-gradient(120deg,#0e302b,#1e6556);color:white;padding:20px}
+header h1{margin:0 0 7px;font-size:21px}
+header p{margin:0;color:#d8e9e2;font-size:13px}
+main{max-width:1150px;margin:auto;padding:12px}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:15px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:white;border:1px solid var(--line);padding:14px;border-radius:13px;overflow-wrap:anywhere}
+.stat small{color:#66756f}.stat b{display:block;margin-top:8px;font-size:20px}
+nav{display:flex;gap:7px;overflow:auto;padding:8px 0}
+nav button{white-space:nowrap;background:white;color:var(--g);border:1px solid var(--line)}
+nav button.active{background:var(--g);color:white}
+.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.field{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+label{font-size:13px;font-weight:bold}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{text-align:right;padding:10px;border-bottom:1px solid var(--line);font-size:13px}
+th{background:#eef5f1}
+.secondary{background:#e5f2eb;color:var(--g)}
+.danger{background:#fff0ee;color:var(--red)}
+.hidden{display:none!important}
+.note{padding:12px;background:#fff8e5;border-radius:10px;font-size:12px;line-height:1.8}
+.line{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:6px;margin:7px 0}
+.total{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#toast{position:fixed;bottom:15px;left:12px;right:12px;max-width:500px;margin:auto;background:#142e27;color:white;padding:13px;border-radius:12px;z-index:10}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fields{grid-template-columns:1fr}.line{grid-template-columns:1fr 1fr}.line select{grid-column:1/-1}header{padding:16px}main{padding:8px}}
+@media print{header,nav,.noprint,#login,.actions{display:none!important}.card{border:0}}
+</style>
+</head>
+<body>
+<header>
+<h1>Dental Stock Pro</h1>
+<p>إدارة مخزون ومبيعات مستلزمات الأسنان — الدينار العراقي</p>
+</header>
 
+<main>
+<section id="login" class="card">
+<h2>تسجيل الدخول</h2>
+<form id="loginForm">
+<div class="field"><label>البريد الإلكتروني</label><input id="email" type="email" required autocomplete="username"></div>
+<div class="field"><label>كلمة المرور</label><input id="password" type="password" required autocomplete="current-password"></div>
+<button>دخول</button>
+</form>
+<p class="note">استخدم حساب Firebase Authentication الذي أنشأته مسبقاً. لا يوجد تسجيل عام من داخل التطبيق.</p>
+</section>
+
+<section id="app" class="hidden">
+<div class="actions noprint">
+<span id="userEmail"></span>
+<button class="secondary" onclick="refreshData()">تحديث البيانات</button>
+<button class="danger" onclick="logout()">تسجيل الخروج</button>
+</div>
+<nav class="noprint" id="nav">
+<button class="active" data-view="home">الرئيسية</button>
+<button data-view="products">المخزون</button>
+<button data-view="sales">فاتورة بيع</button>
+<button data-view="purchases">المشتريات</button>
+<button data-view="expenses">المصاريف</button>
+<button data-view="reports">التقارير</button>
+</nav>
+
+<section id="v-home">
+<div class="grid">
+<div class="stat"><small>عدد المنتجات</small><b id="sProducts">0</b></div>
+<div class="stat"><small>قيمة المخزون بالتكلفة</small><b id="sCost">0</b></div>
+<div class="stat"><small>مبيعات اليوم</small><b id="sSales">0</b></div>
+<div class="stat"><small>ربح اليوم التقديري</small><b id="sProfit">0</b></div>
+</div>
+<div class="card"><h3>تنبيهات المخزون والصلاحية</h3><div id="alerts"></div></div>
+<div class="card"><h3>آخر فواتير البيع</h3><div id="recent"></div></div>
+</section>
+
+<section id="v-products" class="hidden">
+<div class="card">
+<h3>إضافة منتج أو تحديثه</h3>
+<form id="productForm">
+<input type="hidden" id="pId">
+<div class="fields">
+<div class="field"><label>اسم المنتج *</label><input id="pName" required></div>
+<div class="field"><label>الباركود</label><input id="pBarcode"></div>
+<div class="field"><label>التصنيف</label><input id="pCategory"></div>
+<div class="field"><label>الوحدة</label><input id="pUnit" value="علبة"></div>
+<div class="field"><label>الكمية الحالية *</label><input id="pQty" type="number" min="0" step="any" value="0" required></div>
+<div class="field"><label>سعر الشراء للوحدة *</label><input id="pCost" type="number" min="0" step="any" value="0" required></div>
+<div class="field"><label>سعر البيع للوحدة *</label><input id="pPrice" type="number" min="0" step="any" value="0" required></div>
+<div class="field"><label>حد التنبيه</label><input id="pMin" type="number" min="0" value="5"></div>
+<div class="field"><label>تاريخ الصلاحية</label><input id="pExpiry" type="date"></div>
+<div class="field"><label>المجهز</label><input id="pSupplier"></div>
+<div class="field"><label>رقم التشغيلة</label><input id="pBatch"></div>
+</div>
+<div class="actions"><button>حفظ المنتج</button><button type="button" class="secondary" onclick="clearProduct()">تفريغ الحقول</button></div>
+</form>
+</div>
+<div class="card"><h3>قائمة المنتجات</h3><input id="search" placeholder="ابحث بالاسم أو الباركود أو التصنيف"><br><br><div id="productTable"></div></div>
+</section>
+
+<section id="v-sales" class="hidden">
+<div class="card">
+<h3>فاتورة بيع جديدة</h3>
+<div class="fields">
+<div class="field"><label>التاريخ</label><input id="saleDate" type="datetime-local"></div>
+<div class="field"><label>اسم الزبون</label><input id="customer"></div>
+<div class="field"><label>خصم إضافي للفاتورة</label><input id="billDiscount" type="number" min="0" value="0"></div>
+<div class="field"><label>المبلغ المدفوع</label><input id="paid" type="number" min="0" value="0"></div>
+</div>
+<h4>الأصناف — السعر الفعلي والسماح لكل وحدة</h4>
+<div id="saleLines"></div>
+<div class="actions noprint"><button type="button" class="secondary" onclick="addLine()">إضافة صنف</button></div>
+<div class="total"><span>السماح على الأصناف</span><b id="allowTotal">0</b></div>
+<div class="total"><span>المجموع قبل الخصم</span><b id="subtotal">0</b></div>
+<div class="total"><span>صافي الفاتورة</span><b id="saleTotal">0</b></div>
+<div class="total"><span>المتبقي على الزبون</span><b id="remaining">0</b></div>
+<div class="total"><span>الربح التقديري</span><b id="profit">0</b></div>
+<div class="actions"><button id="saveSale" onclick="saveSale()">حفظ الفاتورة وتحديث المخزون</button><button class="secondary" onclick="print()">طباعة</button></div>
+</div>
+<div class="card"><h3>سجل فواتير البيع</h3><div id="salesTable"></div></div>
+</section>
+
+<section id="v-purchases" class="hidden">
+<div class="card">
+<h3>تسجيل مشتريات</h3>
+<div class="fields">
+<div class="field"><label>التاريخ</label><input id="buyDate" type="datetime-local"></div>
+<div class="field"><label>المنتج</label><select id="buyProduct"></select></div>
+<div class="field"><label>الكمية المضافة</label><input id="buyQty" type="number" min="0.01" step="any" value="1"></div>
+<div class="field"><label>تكلفة الوحدة</label><input id="buyCost" type="number" min="0" step="any"></div>
+<div class="field"><label>المبلغ المدفوع</label><input id="buyPaid" type="number" min="0" step="any"></div>
+<div class="field"><label>المجهز</label><input id="buySupplier"></div>
+</div>
+<button onclick="savePurchase()">حفظ المشتريات</button>
+</div>
+<div class="card"><h3>سجل المشتريات</h3><div id="purchasesTable"></div></div>
+</section>
+
+<section id="v-expenses" class="hidden">
+<div class="card">
+<h3>تسجيل مصروف</h3>
+<div class="fields">
+<div class="field"><label>التاريخ</label><input id="expenseDate" type="datetime-local"></div>
+<div class="field"><label>نوع المصروف</label><select id="expenseCategory"><option>نقل وشحن</option><option>إيجار</option><option>كهرباء</option><option>رواتب</option><option>تغليف</option><option>أخرى</option></select></div>
+<div class="field"><label>المبلغ</label><input id="expenseAmount" type="number" min="1"></div>
+<div class="field"><label>التفاصيل</label><input id="expenseNote"></div>
+</div>
+<button onclick="saveExpense()">حفظ المصروف</button>
+</div>
+<div class="card"><h3>سجل المصاريف</h3><div id="expensesTable"></div></div>
+</section>
+
+<section id="v-reports" class="hidden">
+<div class="card">
+<h3>التقارير حسب الفترة</h3>
+<div class="fields">
+<div class="field"><label>من تاريخ</label><input id="fromDate" type="date"></div>
+<div class="field"><label>إلى تاريخ</label><input id="toDate" type="date"></div>
+</div>
+<button onclick="renderReports()">عرض التقرير</button>
+<div class="grid" id="reportStats"></div>
+<div id="reportTable"></div>
+</div>
+</section>
+</section>
+</main>
+<div id="toast" class="hidden"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,doc,getDocs,addDoc,updateDoc,deleteDoc,runTransaction} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyC2K0WFgjMtbym7xDKTCwqrKMEGoU97CWs",
+ authDomain:"amir-dental-inventory.firebaseapp.com",
+ projectId:"amir-dental-inventory",
+ storageBucket:"amir-dental-inventory.firebasestorage.app",
+ messagingSenderId:"802882905915",
+ appId:"1:802882905915:web:3b262e3ce6df81ea0b391e",
+ measurementId:"G-YJC94K7KRF"
+};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+const n=x=>Math.max(0,Number(x)||0);
+const money=x=>new Intl.NumberFormat("ar-IQ",{maximumFractionDigits:0}).format(Math.round(Number(x)||0))+" د.ع";
+const dateNow=()=>{let d=new Date(Date.now()-new Date().getTimezoneOffset()*60000);return d.toISOString().slice(0,16)};
+const today=()=>dateNow().slice(0,10);
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let user=null,products=[],sales=[],purchases=[],expenses=[];
+function toast(s,bad=false){$("toast").textContent=s;$("toast").classList.remove("hidden");$("toast").style.background=bad?"#a4231b":"#142e27";setTimeout(()=>$("toast").classList.add("hidden"),3500)}
+function stamp(){return new Date().toISOString()}
+function table(head,rows){if(!rows.length)return '<p>لا توجد سجلات بعد.</p>';return '<div class="tablewrap"><table><thead><tr>'+head.map(x=>`<th>${x}</th>`).join("")+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(x=>`<td>${x??""}</td>`).join("")+'</tr>').join("")+'</tbody></table></div>'}
+function view(v){document.querySelectorAll("main section[id^=v-]").forEach(x=>x.classList.add("hidden"));$("v-"+v).classList.remove("hidden");document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===v));if(v==="sales")renderSales();if(v==="purchases")renderPurchases();if(v==="expenses")renderExpenses();if(v==="reports")renderReports()}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>view(b.dataset.view));
+$("loginForm").onsubmit=async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);$("password").value=""}catch(err){toast("تعذّر الدخول. تأكد من البريد وكلمة المرور وتفعيل Email/Password.",true)}};
+onAuthStateChanged(auth,async u=>{user=u;$("login").classList.toggle("hidden",!!u);$("app").classList.toggle("hidden",!u);if(u){$("userEmail").textContent=u.email||"";initDates();await refreshData()}});
+window.logout=()=>signOut(auth);
+function initDates(){for(const id of ["saleDate","buyDate","expenseDate"])$(id).value=dateNow();$("fromDate").value=today().slice(0,8)+"01";$("toDate").value=today()}
+async function readCol(c){const s=await getDocs(collection(db,c));return s.docs.map(d=>({id:d.id,...d.data()}))}
+window.refreshData=async()=>{try{[products,sales,purchases,expenses]=await Promise.all([readCol("inventory"),readCol("sales"),readCol("purchases"),readCol("expenses")]);products.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));sales.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));purchases.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));expenses.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));renderAll();toast("تم تحديث البيانات من Firebase")}catch(e){console.error(e);toast("فشل تحميل البيانات. تحقق من قواعد Firestore.",true)}};
+function renderAll(){renderProducts();fillProducts();renderSales();renderPurchases();renderExpenses();renderHome()}
+function renderHome(){let ss=sales.filter(s=>(s.date||"").slice(0,10)===today());$("sProducts").textContent=products.length;$("sCost").textContent=money(products.reduce((a,p)=>a+n(p.quantity)*n(p.purchasePrice),0));$("sSales").textContent=money(ss.reduce((a,s)=>a+n(s.total),0));$("sProfit").textContent=money(ss.reduce((a,s)=>a+n(s.profit),0));let alerts=products.filter(p=>n(p.quantity)<=n(p.minQuantity)||p.expiryDate&&p.expiryDate<=new Date(Date.now()+90*864e5).toISOString().slice(0,10));$("alerts").innerHTML=alerts.length?table(["المنتج","الكمية","حد التنبيه","الصلاحية"],alerts.map(p=>[esc(p.name),n(p.quantity),n(p.minQuantity),esc(p.expiryDate||"—")])):"لا توجد تنبيهات حالياً.";$("recent").innerHTML=table(["الفاتورة","التاريخ","الصافي","المدفوع","المتبقي"],sales.slice(0,5).map(s=>[esc(s.invoiceNo),esc(s.date),money(s.total),money(s.paid),money(s.remaining)]))}
+$("search").addEventListener("input",renderProducts);
+function renderProducts(){let q=($("search")?.value||"").toLowerCase();let list=products.filter(p=>[p.name,p.barcode,p.category].some(v=>String(v||"").toLowerCase().includes(q)));$("productTable").innerHTML=table(["المنتج / الباركود","التصنيف","الكمية","الشراء","البيع","الربح للوحدة","الصلاحية","إجراء"],list.map(p=>[`${esc(p.name)}<br>${esc(p.barcode||"—")}`,esc(p.category||"—"),`${n(p.quantity)} ${esc(p.unit||"")}`,money(p.purchasePrice),money(p.sellingPrice),money(n(p.sellingPrice)-n(p.purchasePrice)),esc(p.expiryDate||"—"),`<button class="secondary" onclick="editProduct('${p.id}')">تعديل</button> <button class="danger" onclick="removeProduct('${p.id}')">حذف</button>`]))}
+function clearProduct(){["pId","pName","pBarcode","pCategory","pExpiry","pSupplier","pBatch"].forEach(id=>$(id).value="");$("pUnit").value="علبة";$("pQty").value=0;$("pCost").value=0;$("pPrice").value=0;$("pMin").value=5}
+window.clearProduct=clearProduct;
+window.editProduct=id=>{let p=products.find(x=>x.id===id);if(!p)return;view("products");$("pId").value=p.id;$("pName").value=p.name||"";$("pBarcode").value=p.barcode||"";$("pCategory").value=p.category||"";$("pUnit").value=p.unit||"علبة";$("pQty").value=n(p.quantity);$("pCost").value=n(p.purchasePrice);$("pPrice").value=n(p.sellingPrice);$("pMin").value=n(p.minQuantity);$("pExpiry").value=p.expiryDate||"";$("pSupplier").value=p.supplier||"";$("pBatch").value=p.batch||"";window.scrollTo(0,0)};
+window.removeProduct=async id=>{let p=products.find(x=>x.id===id);if(!p||!confirm("حذف المنتج "+p.name+"؟"))return;try{await deleteDoc(doc(db,"inventory",id));await refreshData();toast("تم حذف المنتج")}catch(e){toast("فشل الحذف: تحقق من الصلاحيات",true)}};
+$("productForm").onsubmit=async e=>{e.preventDefault();let id=$("pId").value;let data={name:$("pName").value.trim(),barcode:$("pBarcode").value.trim(),category:$("pCategory").value.trim(),unit:$("pUnit").value.trim()||"وحدة",quantity:n($("pQty").value),purchasePrice:n($("pCost").value),sellingPrice:n($("pPrice").value),minQuantity:n($("pMin").value),expiryDate:$("pExpiry").value,supplier:$("pSupplier").value.trim(),batch:$("pBatch").value.trim(),updatedAt:stamp(),updatedBy:user.uid};if(!data.name)return toast("اكتب اسم المنتج",true);try{if(id)await updateDoc(doc(db,"inventory",id),data);else{data.createdAt=stamp();data.createdBy=user.uid;await addDoc(collection(db,"inventory"),data)}clearProduct();await refreshData();toast("تم حفظ المنتج")}catch(err){console.error(err);toast("فشل الحفظ. افحص قواعد Firestore.",true)}};
+function fillProducts(){let opts='<option value="">اختر المنتج</option>'+products.map(p=>`<option value="${p.id}">${esc(p.name)} — متوفر ${n(p.quantity)}</option>`).join("");$("buyProduct").innerHTML=opts}
+$("buyProduct").onchange=()=>{let p=products.find(p=>p.id===$("buyProduct").value);if(p)$("buyCost").value=n(p.purchasePrice)};
+function addLine(productId="",qty=1){let el=document.createElement("div");el.className="line";el.innerHTML=`<select class="lp">${'<option value="">اختر المنتج</option>'+products.map(p=>`<option value="${p.id}" ${p.id===productId?"selected":""}>${esc(p.name)} (متوفر ${n(p.quantity)})</option>`).join("")}</select><input class="lq" type="number" min=".01" step="any" value="${qty}" title="الكمية"><input class="lprice" type="number" min="0" step="any" value="0" title="السعر الفعلي للوحدة"><input class="lallow" type="number" min="0" step="any" value="0" title="السماح للوحدة"><button type="button" class="danger">×</button>`;$("saleLines").appendChild(el);let sel=el.querySelector(".lp"),price=el.querySelector(".lprice"),allow=el.querySelector(".lallow");sel.onchange=()=>{let p=products.find(p=>p.id===sel.value);if(p){price.value=n(p.sellingPrice);allow.value=0}calcSale()};price.oninput=()=>{let p=products.find(p=>p.id===sel.value);if(p)allow.value=Math.max(0,n(p.sellingPrice)-n(price.value));calcSale()};allow.oninput=()=>{let p=products.find(p=>p.id===sel.value);if(p)price.value=Math.max(0,n(p.sellingPrice)-n(allow.value));calcSale()};el.querySelector(".lq").oninput=calcSale;el.querySelector("button").onclick=()=>{el.remove();calcSale()};if(productId){let p=products.find(p=>p.id===productId);if(p)price.value=n(p.sellingPrice)}calcSale()}
+window.addLine=addLine;
+function getLines(){return [...$("saleLines").children].map(el=>{let p=products.find(p=>p.id===el.querySelector(".lp").value);return p?{p,qty:n(el.querySelector(".lq").value),price:n(el.querySelector(".lprice").value),allow:n(el.querySelector(".lallow").value)}:null}).filter(x=>x&&x.qty>0)}
+function calcSale(){if(!$("saleLines"))return;let ls=getLines(),sub=ls.reduce((s,l)=>s+n(l.p.sellingPrice)*l.qty,0),allow=ls.reduce((s,l)=>s+l.allow*l.qty,0),disc=n($("billDiscount").value),raw=ls.reduce((s,l)=>s+l.price*l.qty,0),total=Math.max(0,raw-disc),paid=n($("paid").value),profit=ls.reduce((s,l)=>s+(l.price-n(l.p.purchasePrice))*l.qty,0)-disc;$("allowTotal").textContent=money(allow);$("subtotal").textContent=money(sub);$("saleTotal").textContent=money(total);$("remaining").textContent=money(Math.max(0,total-paid));$("profit").textContent=money(profit);return {ls,sub,allow,disc,total,paid,profit}}
+window.addLine=addLine;$("billDiscount").oninput=calcSale;$("paid").oninput=calcSale;
+window.saveSale=async()=>{let c=calcSale();if(!c.ls.length)return toast("أضف منتجاً للفاتورة",true);if(c.paid>c.total)return toast("المدفوع أكبر من صافي الفاتورة",true);if(c.ls.some(l=>l.qty>n(l.p.quantity)))return toast("إحدى الكميات المطلوبة أكبر من المخزون",true);if(c.ls.some(l=>l.allow>n(l.p.sellingPrice)))return toast("السماح أكبر من سعر المنتج",true);let btn=$("saveSale");btn.disabled=true;let invoiceNo="DSP-"+Date.now().toString().slice(-8);try{await runTransaction(db,async tx=>{let grouped=new Map();c.ls.forEach(l=>grouped.set(l.p.id,(grouped.get(l.p.id)||0)+l.qty));let refs=[...grouped.keys()].map(id=>doc(db,"inventory",id));let snaps=[];for(let r of refs)snaps.push(await tx.get(r));snaps.forEach((s,i)=>{if(!s.exists()||n(s.data().quantity)<[...grouped.values()][i])throw Error("المخزون تغير أو لم يعد كافياً")});snaps.forEach((s,i)=>tx.update(refs[i],{quantity:n(s.data().quantity)-[...grouped.values()][i],updatedAt:stamp()}));let sr=doc(collection(db,"sales"));tx.set(sr,{invoiceNo,date:$("saleDate").value||dateNow(),customer:$("customer").value.trim(),subtotal:c.sub,allowance:c.allow,billDiscount:c.disc,total:c.total,paid:c.paid,remaining:Math.max(0,c.total-c.paid),profit:c.profit,items:c.ls.map(l=>({productId:l.p.id,name:l.p.name,qty:l.qty,originalPrice:n(l.p.sellingPrice),unitPrice:l.price,allowance:l.allow,costAtSale:n(l.p.purchasePrice),lineTotal:l.price*l.qty})),createdBy:user.uid,createdAt:stamp()})});$("saleLines").innerHTML="";$("customer").value="";$("billDiscount").value=0;$("paid").value=0;$("saleDate").value=dateNow();addLine();await refreshData();toast("تم حفظ الفاتورة رقم "+invoiceNo)}catch(e){console.error(e);toast("لم تُحفظ الفاتورة: "+e.message,true)}finally{btn.disabled=false}};
+function renderSales(){$("salesTable").innerHTML=table(["الفاتورة","التاريخ","الزبون","الصافي","المدفوع","المتبقي","الربح"],sales.map(s=>[esc(s.invoiceNo||s.id),esc(s.date||""),esc(s.customer||"—"),money(s.total),money(s.paid),money(s.remaining),money(s.profit)]))}
+window.savePurchase=async()=>{let p=products.find(x=>x.id===$("buyProduct").value),qty=n($("buyQty").value),cost=n($("buyCost").value),paid=n($("buyPaid").value);if(!p||qty<=0)return toast("اختر المنتج واكتب كمية صحيحة",true);try{await runTransaction(db,async tx=>{let r=doc(db,"inventory",p.id),s=await tx.get(r);if(!s.exists())throw Error("المنتج غير موجود");let old=s.data(),oq=n(old.quantity),nq=oq+qty,avg=nq?((oq*n(old.purchasePrice)+qty*cost)/nq):cost;tx.update(r,{quantity:nq,purchasePrice:avg,updatedAt:stamp()});let pr=doc(collection(db,"purchases"));tx.set(pr,{date:$("buyDate").value||dateNow(),productId:p.id,productName:p.name,qty,unitCost:cost,total:qty*cost,paid,supplier:$("buySupplier").value.trim(),createdBy:user.uid,createdAt:stamp()})});await refreshData();toast("تم تسجيل المشتريات وتحديث المخزون")}catch(e){toast("فشل تسجيل المشتريات: "+e.message,true)}};
+function renderPurchases(){$("purchasesTable").innerHTML=table(["التاريخ","المنتج","الكمية","تكلفة الوحدة","الإجمالي","المدفوع","المجهز"],purchases.map(p=>[esc(p.date),esc(p.productName),n(p.qty),money(p.unitCost),money(p.total),money(p.paid),esc(p.supplier||"—")]))}
+window.saveExpense=async()=>{let amount=n($("expenseAmount").value);if(!amount)return toast("اكتب مبلغ المصروف",true);try{await addDoc(collection(db,"expenses"),{date:$("expenseDate").value||dateNow(),category:$("expenseCategory").value,amount,note:$("expenseNote").value.trim(),createdBy:user.uid,createdAt:stamp()});$("expenseAmount").value="";$("expenseNote").value="";await refreshData();toast("تم حفظ المصروف")}catch(e){toast("فشل حفظ المصروف",true)}};
+function renderExpenses(){$("expensesTable").innerHTML=table(["التاريخ","التصنيف","التفاصيل","المبلغ"],expenses.map(e=>[esc(e.date),esc(e.category),esc(e.note||"—"),money(e.amount)]))}
+window.renderReports=()=>{let f=$("fromDate").value||"0000-00-00",t=$("toDate").value||"9999-99-99";if(f>t)return toast("تحقق من نطاق التاريخ",true);let ss=sales.filter(s=>(s.date||"").slice(0,10)>=f&&(s.date||"").slice(0,10)<=t),pp=purchases.filter(s=>(s.date||"").slice(0,10)>=f&&(s.date||"").slice(0,10)<=t),ee=expenses.filter(s=>(s.date||"").slice(0,10)>=f&&(s.date||"").slice(0,10)<=t);let rev=ss.reduce((a,s)=>a+n(s.total),0),prof=ss.reduce((a,s)=>a+n(s.profit),0),ex=ee.reduce((a,s)=>a+n(s.amount),0),buy=pp.reduce((a,s)=>a+n(s.total),0);$("reportStats").innerHTML=[["المبيعات",rev],["ربح الفواتير",prof],["المصاريف",ex],["الربح بعد المصاريف",prof-ex],["المشتريات",buy],["عدد الفواتير",ss.length]].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${money(b)}</b></div>`).join("");$("reportTable").innerHTML=table(["الفاتورة","التاريخ","الصافي","الربح"],ss.map(s=>[esc(s.invoiceNo),esc(s.date),money(s.total),money(s.profit)]))}
+function renderAll(){renderProducts();fillProducts();renderSales();renderPurchases();renderExpenses();renderHome()}
+</script>
+</body>
+</html>
