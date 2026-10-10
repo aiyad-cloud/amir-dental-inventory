@@ -1,279 +1,179 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>مبيعات مستلزمات الأسنان</title>
+<title>نظام مبيعات المستلزمات الطبية</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Tahoma,sans-serif;background:#f3f6f4;color:#19352e}
-header{background:#174b42;color:white;padding:20px;border-radius:0 0 18px 18px}
-header h1{margin:0 0 7px;font-size:23px}
-header p{margin:0;color:#d7e7e1}
-main{max-width:1200px;margin:auto;padding:14px}
-nav{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
-button{cursor:pointer;font:inherit;border:0;border-radius:9px;padding:10px 13px;background:#174b42;color:white}
-nav button{background:white;color:#174b42;font-weight:bold;flex:1}
-nav button.active{background:#174b42;color:white}
-.panel,.stat{background:white;border:1px solid #e0e8e3;border-radius:13px;padding:15px;margin-bottom:13px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stat small{color:#6a7d75}.stat strong{display:block;font-size:19px;margin-top:8px}
-.layout{display:grid;grid-template-columns:1.4fr .8fr;gap:12px}
-.products{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.product{background:white;color:#174b42;border:1px solid #dce7e1;text-align:right;min-height:95px}
-.product span{display:block;margin-top:8px}
-.price{font-weight:bold;color:#26735e}
-input,select{width:100%;padding:11px;border:1px solid #d6e1db;border-radius:8px;margin:5px 0 12px;background:white}
-label{font-size:13px}
-.cartline{padding:10px 0;border-bottom:1px solid #e0e8e3}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.row>*{flex:1}
-.total{display:flex;justify-content:space-between;font-size:19px;font-weight:bold;padding:14px 0}
-.secondary{background:#e7f0eb;color:#174b42}
-.danger{background:#fff0ef;color:#a32121}
+body{margin:0;font-family:Tahoma,Arial;background:#f2f6f4;color:#20312c}
+header{background:#176b57;color:white;padding:20px}
+main{max-width:1100px;margin:auto;padding:14px}
+nav,.actions,.row{display:flex;gap:8px;flex-wrap:wrap}
+button{border:0;border-radius:9px;padding:11px 14px;background:#e0ece7;color:#145342;font-weight:bold;cursor:pointer}
+button.primary{background:#176b57;color:white}
+button.danger{background:#ffe5e3;color:#a32118}
+.tab.active{background:#176b57;color:white}
+.panel,.stat{background:white;border:1px solid #dce7e2;border-radius:13px;padding:15px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.stat small{color:#687873}.stat strong{display:block;font-size:21px;margin-top:8px;color:#176b57}
+label{display:block;font-size:13px;font-weight:bold;margin:10px 0 5px}
+input{width:100%;padding:12px;border:1px solid #cbd9d3;border-radius:9px;font-size:15px}
+.field{min-width:0;flex:1}
+.product{width:100%;text-align:right;background:white;border:1px solid #dce7e2;white-space:normal}
+.product strong,.product small,.product b{display:block;margin-bottom:6px}
+.product b{color:#176b57}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+table{width:100%;border-collapse:collapse;min-width:550px}
+th,td{text-align:right;padding:10px;border-bottom:1px solid #e0e8e4;font-size:13px}
+th{background:#f3f7f5}
+.tablewrap{overflow-x:auto;margin-top:10px}
 .hidden{display:none!important}
-table{width:100%;border-collapse:collapse;min-width:520px}
-th,td{text-align:right;padding:10px;border-bottom:1px solid #e3e9e5;font-size:13px}
-.tablewrap{overflow:auto}
-.muted{font-size:12px;color:#718079}
-video{width:100%;max-height:300px;background:#111;border-radius:10px}
-@media(max-width:750px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.products{grid-template-columns:repeat(2,1fr)}}
+.muted{font-size:12px;color:#687873;line-height:1.8}
+.notice{padding:10px;background:#edf6f1;border-radius:8px;margin-top:10px}
+.receipt{border:1px dashed #8ca59a;padding:14px;margin-top:12px}
+@media print{header,nav,.no-print,button{display:none!important}body{background:white}.panel{border:0}}
 </style>
 </head>
 <body>
 <header>
-<h1>مبيعات مستلزمات الأسنان</h1>
-<p>نظام محلي للمبيعات والمخزون والأرباح</p>
+<h2>نظام مبيعات المستلزمات الطبية</h2>
+<p>المبيعات والمخزون والمشتريات والأرباح</p>
 </header>
 <main>
-<nav>
-<button class="active" data-page="sales">المبيعات</button>
-<button data-page="productsPage">المنتجات</button>
-<button data-page="profitPage">الأرباح</button>
-<button data-page="backupPage">النسخ الاحتياطي</button>
+<nav class="no-print">
+<button class="tab active" data-page="sales">المبيعات</button>
+<button class="tab" data-page="products">المنتجات والمخزون</button>
+<button class="tab" data-page="profit">الأرباح</button>
+<button class="tab" data-page="backup">النسخ الاحتياطي</button>
 </nav>
 
-<section class="stats" id="stats">
+<section id="sales">
+<div class="stats">
 <div class="stat"><small>مبيعات اليوم</small><strong id="todaySales">0 د.ع</strong></div>
 <div class="stat"><small>فواتير اليوم</small><strong id="todayCount">0</strong></div>
-<div class="stat"><small>ربح اليوم</small><strong id="todayProfit">0 د.ع</strong></div>
 <div class="stat"><small>عدد المنتجات</small><strong id="productCount">0</strong></div>
-</section>
-
-<section id="sales">
-<div class="layout">
-<div>
-<div class="panel">
-<h3>البحث والبيع</h3>
-<label for="search">اسم المنتج أو الباركود</label>
-<input id="search" placeholder="ابحث عن منتج...">
-<div class="row">
-<button id="showCamera">📷 قراءة بالكاميرا</button>
-<button class="secondary" id="manualLookup">بحث بالباركود</button>
-</div>
-<div id="cameraBox" class="hidden">
-<video id="video" playsinline></video>
-<div class="row">
-<button id="startCamera">تشغيل الكاميرا</button>
-<button class="secondary" id="stopCamera">إيقاف</button>
-</div>
-<p id="cameraStatus" class="muted">الكاميرا متوقفة.</p>
-</div>
-<div class="products" id="productCards"></div>
+<div class="stat"><small>كميات المخزون</small><strong id="stockCount">0</strong></div>
 </div>
 <div class="panel">
-<h3>آخر الفواتير</h3>
-<div class="tablewrap"><table><thead><tr><th>الفاتورة</th><th>التاريخ</th><th>الإجمالي</th><th>الربح</th></tr></thead><tbody id="recentSales"></tbody></table></div>
+<h3>مسح الباركود والبحث</h3>
+<label for="barcode">امسح الباركود أو اكتب رقمه</label>
+<div class="row">
+<div class="field"><input id="barcode" placeholder="ضع المؤشر هنا وامسح الباركود"></div>
+<button class="primary" id="addBarcode">إضافة</button>
 </div>
+<p class="muted">لا توجد كاميرا. استخدم قارئ باركود USB أو Bluetooth الذي يكتب الرقم مثل لوحة المفاتيح ويرسل Enter.</p>
+<label for="search">البحث عن المنتج بالاسم</label>
+<input id="search" placeholder="اكتب اسم المنتج أو الباركود">
+<div id="productTiles" class="products"></div>
+<div id="message" class="notice hidden"></div>
 </div>
 <div class="panel">
 <h3>سلة البيع</h3>
-<div id="cart">السلة فارغة</div>
-<div class="total"><span>الإجمالي</span><span id="cartTotal">0 د.ع</span></div>
-<button id="finishSale">إتمام البيع</button>
-<button class="secondary" id="clearCart">إفراغ السلة</button>
-<div id="receipt"></div>
-</div>
-</div>
-</section>
-
-<section id="productsPage" class="hidden">
-<div class="panel">
-<h3>إضافة منتج</h3>
-<form id="productForm">
-<label>اسم المنتج</label><input id="name" required>
-<label>الباركود</label><input id="barcode">
-<div class="row">
-<div><label>سعر الشراء</label><input id="buy" type="number" min="0" required></div>
-<div><label>سعر البيع</label><input id="sell" type="number" min="0" required></div>
-</div>
-<div class="row">
-<div><label>الكمية الابتدائية</label><input id="qty" type="number" min="0" value="0" required></div>
-<div><label>حد التنبيه</label><input id="minimum" type="number" min="0" value="3" required></div>
-</div>
-<button type="submit">حفظ المنتج</button>
-</form>
-</div>
-<div class="panel">
-<h3>المنتجات المسجلة</h3>
-<div class="tablewrap"><table><thead><tr><th>المنتج</th><th>الباركود</th><th>متوسط الشراء</th><th>البيع</th><th>المخزون</th><th>إجراء</th></tr></thead><tbody id="productRows"></tbody></table></div>
-</div>
-<div class="panel">
-<h3>تسجيل شراء كمية إضافية</h3>
-<form id="purchaseForm">
-<label>المنتج</label><select id="purchaseProduct" required></select>
-<label>الكمية المشتراة</label><input id="purchaseQty" type="number" min="1" required>
-<label>سعر شراء القطعة الجديدة</label><input id="purchasePrice" type="number" min="0" required>
-<button type="submit">تسجيل الشراء</button>
-</form>
+<div id="emptyCart" class="muted">السلة فارغة</div>
+<div class="tablewrap"><table id="cartTable" class="hidden"><thead><tr><th>المنتج</th><th>السعر</th><th>الكمية</th><th>المجموع</th><th></th></tr></thead><tbody id="cartBody"></tbody></table></div>
+<p>الإجمالي: <strong id="cartTotal">0 د.ع</strong></p>
+<div class="actions no-print"><button class="primary" id="finish">إتمام البيع وطباعة الفاتورة</button><button class="danger" id="clearCart">تفريغ السلة</button></div>
+<div id="receipt" class="receipt hidden"></div>
 </div>
 </section>
 
-<section id="profitPage" class="hidden">
+<section id="products" class="hidden">
 <div class="panel">
-<h3>تقرير الأرباح</h3>
-<div class="row"><div><label>من تاريخ</label><input type="date" id="fromDate"></div><div><label>إلى تاريخ</label><input type="date" id="toDate"></div></div>
-<button id="reportButton">عرض التقرير</button>
-<p>المبيعات: <strong id="rSales">0 د.ع</strong></p>
-<p>تكلفة البضاعة: <strong id="rCost">0 د.ع</strong></p>
-<p>الربح الإجمالي: <strong id="rProfit">0 د.ع</strong></p>
-<div class="tablewrap"><table><thead><tr><th>الفاتورة</th><th>التاريخ</th><th>المبيعات</th><th>التكلفة</th><th>الربح</th></tr></thead><tbody id="reportRows"></tbody></table></div>
+<h3>إضافة منتج أو تعديله</h3>
+<div class="grid">
+<div><label>اسم المنتج</label><input id="pName" placeholder="اسم المنتج"></div>
+<div><label>الباركود</label><input id="pBarcode" placeholder="رقم الباركود"></div>
+<div><label>سعر البيع بالدينار</label><input id="pSell" type="number" min="0"></div>
+<div><label>الكمية بالمخزن</label><input id="pQty" type="number" min="0" value="0"></div>
+<div><label>كلفة الوحدة</label><input id="pCost" type="number" min="0" value="0"></div>
+</div>
+<div class="actions"><button class="primary" id="saveProduct">حفظ المنتج</button><button id="resetProduct">تفريغ الحقول</button></div>
+<p class="muted">لإضافة بضاعة جديدة استخدم قسم المشتريات حتى تُحدّث الكمية وكلفة الشراء المتوسطة.</p>
+</div>
+<div class="panel">
+<h3>المشتريات</h3>
+<div class="grid">
+<div><label>باركود المنتج</label><input id="buyBarcode" placeholder="الباركود"></div>
+<div><label>الكمية المشتراة</label><input id="buyQty" type="number" min="1" value="1"></div>
+<div><label>كلفة الوحدة الجديدة</label><input id="buyCost" type="number" min="0" placeholder="0"></div>
+</div>
+<button class="primary" id="buy">تسجيل الشراء وزيادة المخزون</button>
+</div>
+<div class="panel">
+<h3>المخزون</h3>
+<input id="stockSearch" placeholder="بحث بالاسم أو الباركود">
+<div class="tablewrap"><table><thead><tr><th>المنتج</th><th>الباركود</th><th>الكمية</th><th>الكلفة</th><th>البيع</th><th>إجراء</th></tr></thead><tbody id="stockBody"></tbody></table></div>
 </div>
 </section>
 
-<section id="backupPage" class="hidden">
+<section id="profit" class="hidden">
+<div class="stats">
+<div class="stat"><small>مبيعات اليوم</small><strong id="pTodaySales">0 د.ع</strong></div>
+<div class="stat"><small>ربح اليوم</small><strong id="pTodayProfit">0 د.ع</strong></div>
+<div class="stat"><small>إجمالي المبيعات</small><strong id="pAllSales">0 د.ع</strong></div>
+<div class="stat"><small>إجمالي الأرباح</small><strong id="pAllProfit">0 د.ع</strong></div>
+</div>
+<div class="panel"><h3>سجل الفواتير</h3><p class="muted">الربح الإجمالي لا يشمل المصاريف الأخرى.</p>
+<div class="tablewrap"><table><thead><tr><th>رقم الفاتورة</th><th>التاريخ</th><th>الوحدات</th><th>المبيعات</th><th>الربح</th></tr></thead><tbody id="salesBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="backup" class="hidden">
 <div class="panel">
 <h3>النسخ الاحتياطي</h3>
-<p class="muted">النسخة الاحتياطية تنقل البيانات يدوياً، ولا تدمج تلقائياً مبيعات جهازين.</p>
-<button id="export">تصدير نسخة احتياطية</button>
-<label for="import">استعادة نسخة احتياطية</label>
-<input type="file" id="import" accept=".json,application/json">
+<p class="muted">البيانات محفوظة على هذا المتصفح والجهاز. لن تنتقل تلقائياً إلى جهاز آخر.</p>
+<div class="actions"><button class="primary" id="export">تنزيل نسخة احتياطية</button><button id="importBtn">استيراد نسخة</button><input id="importFile" type="file" accept=".json,application/json" class="hidden"></div>
 </div>
+<div class="panel"><h3>حذف البيانات</h3><button class="danger" id="wipe">حذف كل البيانات</button></div>
 </section>
 </main>
 
 <script>
-const KEY="dental_sales_v1";
-const fresh=()=>({products:[],sales:[],purchases:[]});
-let db;
-try{db=JSON.parse(localStorage.getItem(KEY))||fresh()}catch{db=fresh()}
-if(!Array.isArray(db.products)||!Array.isArray(db.sales)||!Array.isArray(db.purchases))db=fresh();
-let cart=[],stream=null,scanner=null,scanning=false,scanTimer=null;
+"use strict";
 const $=id=>document.getElementById(id);
-const money=n=>new Intl.NumberFormat("en-US",{maximumFractionDigits:0}).format(Math.round(Number(n)||0))+" د.ع";
-const today=()=>{let d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
-const safe=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const id=prefix=>prefix+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7);
-const product=pid=>db.products.find(p=>p.id===pid);
-const total=s=>s.items.reduce((a,i)=>a+i.price*i.qty,0);
-const cost=s=>s.items.reduce((a,i)=>a+i.cost*i.qty,0);
-const profit=s=>total(s)-cost(s);
-const day=s=>s.date.slice(0,10);
-function persist(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
-document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{
- document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x===b));
- ["sales","productsPage","profitPage","backupPage"].forEach(k=>$(k).classList.toggle("hidden",k!==b.dataset.page));
- $("stats").classList.toggle("hidden",b.dataset.page==="backup");
- if(b.dataset.page==="profitPage")renderReport();
-});
-function renderProducts(){
- let q=$("search").value.trim().toLowerCase();
- let list=db.products.filter(p=>p.name.toLowerCase().includes(q)||(p.barcode||"").toLowerCase().includes(q));
- $("productCards").innerHTML=list.length?list.map(p=>`<button class="product" data-add="${safe(p.id)}" ${p.qty<=0?"disabled":""}><strong>${safe(p.name)}</strong><span class="muted">المخزون: ${p.qty}</span><span class="price">${money(p.sell)}</span></button>`).join(""):'<p class="muted">لا توجد منتجات مطابقة. أضف منتجات من قسم المنتجات.</p>';
- document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addCart(b.dataset.add));
- $("productRows").innerHTML=db.products.map(p=>`<tr><td>${safe(p.name)}</td><td>${safe(p.barcode||"—")}</td><td>${money(p.avgCost)}</td><td>${money(p.sell)}</td><td>${p.qty}</td><td><button class="secondary" data-edit="${safe(p.id)}">تعديل</button> <button class="danger" data-delete="${safe(p.id)}">حذف</button></td></tr>`).join("")||'<tr><td colspan="6">لا توجد منتجات</td></tr>';
- document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editProduct(b.dataset.edit));
- document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>deleteProduct(b.dataset.delete));
- const old=$("purchaseProduct").value;
- $("purchaseProduct").innerHTML=db.products.map(p=>`<option value="${safe(p.id)}">${safe(p.name)} — ${p.qty} قطعة</option>`).join("");
- if(db.products.some(p=>p.id===old))$("purchaseProduct").value=old;
-}
-function addCart(pid){let p=product(pid);if(!p)return;let line=cart.find(i=>i.pid===pid);if((line?.qty||0)+1>p.qty){alert("الكمية غير متوفرة.");return}if(line)line.qty++;else cart.push({pid,qty:1});renderCart()}
-function renderCart(){
- $("cart").innerHTML=cart.length?cart.map(i=>{let p=product(i.pid);return `<div class="cartline"><strong>${safe(p.name)}</strong><p>${money(p.sell)} × ${i.qty}</p><div class="row"><button data-minus="${safe(i.pid)}">−</button><button data-plus="${safe(i.pid)}">+</button><button class="danger" data-remove="${safe(i.pid)}">حذف</button></div></div>`}).join(""):"السلة فارغة";
- document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>changeQty(b.dataset.minus,-1));
- document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>changeQty(b.dataset.plus,1));
- document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{cart=cart.filter(i=>i.pid!==b.dataset.remove);renderCart()});
- $("cartTotal").textContent=money(cart.reduce((a,i)=>a+product(i.pid).sell*i.qty,0));
-}
-function changeQty(pid,n){let i=cart.find(x=>x.pid===pid),p=product(pid);if(!i||!p)return;if(i.qty+n<=0)cart=cart.filter(x=>x.pid!==pid);else if(i.qty+n>p.qty){alert("المخزون لا يكفي");return}else i.qty+=n;renderCart()}
+const KEY="medical_sales_barcode_v3";
+const money=n=>Math.round(Number(n)||0).toLocaleString("en-US")+" د.ع";
+const day=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const blank=()=>({products:[],sales:[],purchases:[]});
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));return d?{products:d.products||[],sales:d.sales||[],purchases:d.purchases||[]}:blank()}catch{return blank()}}
+let db=load(),cart=[],editing=null;
+const byBarcode=c=>db.products.find(p=>String(p.barcode)===String(c).trim());
+const byId=id=>db.products.find(p=>p.id===id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function message(s){$("message").textContent=s;$("message").classList.remove("hidden")}
+function addCart(p){$("message").classList.add("hidden");if(!p){message("الباركود غير مسجل. أضف المنتج أولاً.");return}let i=cart.find(x=>x.id===p.id);if((i?i.qty:0)>=Number(p.qty)){message("الكمية غير كافية بالمخزن.");return}if(i)i.qty++;else cart.push({id:p.id,qty:1});$("barcode").value="";renderCart();$("barcode").focus()}
+function scan(){let c=$("barcode").value.trim();if(c)addCart(byBarcode(c))}
+function renderTiles(){let q=$("search").value.trim().toLowerCase();$("productTiles").innerHTML=db.products.filter(p=>(p.name+" "+p.barcode).toLowerCase().includes(q)).slice(0,80).map(p=>`<button class="product" data-add="${esc(p.id)}"><strong>${esc(p.name)}</strong><small>باركود: ${esc(p.barcode)} | المخزون: ${p.qty}</small><b>${money(p.sell)}</b></button>`).join("")}
+function renderCart(){let body=$("cartBody"),total=0;body.innerHTML="";cart.forEach(i=>{let p=byId(i.id);if(!p)return;let sum=p.sell*i.qty;total+=sum;let tr=document.createElement("tr");tr.innerHTML=`<td>${esc(p.name)}</td><td>${money(p.sell)}</td><td><button data-minus="${p.id}">−</button> ${i.qty} <button data-plus="${p.id}">+</button></td><td>${money(sum)}</td><td><button class="danger" data-remove="${p.id}">حذف</button></td>`;body.appendChild(tr)});$("cartTotal").textContent=money(total);$("emptyCart").classList.toggle("hidden",cart.length>0);$("cartTable").classList.toggle("hidden",cart.length===0)}
+function renderStock(){let q=$("stockSearch").value.trim().toLowerCase();$("stockBody").innerHTML=db.products.filter(p=>(p.name+" "+p.barcode).toLowerCase().includes(q)).map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.barcode)}</td><td>${p.qty}</td><td>${money(p.cost)}</td><td>${money(p.sell)}</td><td><button data-edit="${p.id}">تعديل</button> <button class="danger" data-delete="${p.id}">حذف</button></td></tr>`).join("")}
+function totals(sales){return sales.reduce((sum,s)=>sum+s.items.reduce((a,i)=>a+i.price*i.qty,0),0)}
+function profits(sales){return sales.reduce((sum,s)=>sum+s.items.reduce((a,i)=>a+(i.price-i.cost)*i.qty,0),0)}
+function renderSales(){let sorted=[...db.sales].sort((a,b)=>b.date.localeCompare(a.date));$("salesBody").innerHTML=sorted.map(s=>`<tr><td>${esc(s.id)}</td><td>${new Date(s.date).toLocaleString("ar-IQ")}</td><td>${s.items.reduce((a,i)=>a+i.qty,0)}</td><td>${money(totals([s]))}</td><td>${money(profits([s]))}</td></tr>`).join("")}
+function renderStats(){let today=db.sales.filter(s=>s.date.slice(0,10)===day());$("todaySales").textContent=money(totals(today));$("todayCount").textContent=today.length;$("productCount").textContent=db.products.length;$("stockCount").textContent=db.products.reduce((a,p)=>a+Number(p.qty||0),0);$("pTodaySales").textContent=money(totals(today));$("pTodayProfit").textContent=money(profits(today));$("pAllSales").textContent=money(totals(db.sales));$("pAllProfit").textContent=money(profits(db.sales))}
+function render(){renderTiles();renderStock();renderSales();renderStats()}
+function resetForm(){editing=null;["pName","pBarcode","pSell"].forEach(id=>$(id).value="");$("pQty").value=0;$("pCost").value=0;$("saveProduct").textContent="حفظ المنتج"}
+function receipt(s){$("receipt").innerHTML=`<h3>فاتورة بيع</h3><p>رقم: ${esc(s.id)}</p><p>التاريخ: ${new Date(s.date).toLocaleString("ar-IQ")}</p><hr>${s.items.map(i=>`<p>${esc(i.name)} — ${i.qty} × ${money(i.price)} = ${money(i.qty*i.price)}</p>`).join("")}<hr><h3>الإجمالي: ${money(totals([s]))}</h3><button class="no-print" onclick="window.print()">طباعة</button>`;$("receipt").classList.remove("hidden")}
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));["sales","products","profit","backup"].forEach(p=>$(p).classList.toggle("hidden",p!==b.dataset.page));if(b.dataset.page==="sales")$("barcode").focus()});
+$("addBarcode").onclick=scan;$("barcode").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();scan()}});
+$("search").oninput=renderTiles;$("stockSearch").oninput=renderStock;
+$("productTiles").onclick=e=>{let b=e.target.closest("[data-add]");if(b)addCart(byId(b.dataset.add))};
+$("cartBody").onclick=e=>{let p=e.target.closest("[data-plus]"),m=e.target.closest("[data-minus]"),r=e.target.closest("[data-remove]");if(p){let i=cart.find(x=>x.id===p.dataset.plus),prod=byId(i.id);if(i.qty<prod.qty)i.qty++;else message("الكمية غير كافية");renderCart()}if(m){let i=cart.find(x=>x.id===m.dataset.minus);if(i){i.qty--;if(i.qty<=0)cart=cart.filter(x=>x.id!==m.dataset.minus)}renderCart()}if(r){cart=cart.filter(x=>x.id!==r.dataset.remove);renderCart()}};
+$("finish").onclick=()=>{if(!cart.length){alert("السلة فارغة. امسح باركود منتج أولاً.");$("barcode").focus();return}for(let i of cart){let p=byId(i.id);if(!p||p.qty<i.qty){alert("الكمية غير كافية");return}}let s={id:"INV-"+uid(),date:new Date().toISOString(),items:cart.map(i=>{let p=byId(i.id);return{name:p.name,qty:i.qty,price:Number(p.sell),cost:Number(p.cost||0)}})};cart.forEach(i=>byId(i.id).qty-=i.qty);db.sales.push(s);cart=[];save();renderCart();receipt(s);alert("تم حفظ البيع وتحديث المخزون")};
 $("clearCart").onclick=()=>{cart=[];renderCart()};
-$("productForm").onsubmit=e=>{
- e.preventDefault();let name=$("name").value.trim(),barcode=$("barcode").value.trim(),buy=+$("buy").value,sell=+$("sell").value,qty=+$("qty").value,minimum=+$("minimum").value;
- if(!name||[buy,sell,qty,minimum].some(n=>!Number.isFinite(n)||n<0)||![qty,minimum].every(Number.isInteger)){alert("تحقق من المعلومات");return}
- if(barcode&&db.products.some(p=>p.barcode===barcode)){alert("الباركود مستخدم مسبقاً");return}
- db.products.push({id:id("P"),name,barcode,avgCost:buy,sell,qty,min:minimum});e.target.reset();$("qty").value=0;$("minimum").value=3;persist();
-};
-function editProduct(pid){let p=product(pid);if(!p)return;let name=prompt("اسم المنتج",p.name);if(name===null)return;let sell=prompt("سعر البيع",p.sell);if(sell===null)return;let barcode=prompt("الباركود",p.barcode||"");if(barcode===null)return;let qty=prompt("الكمية الحالية",p.qty);if(qty===null)return;if(!name.trim()||!Number.isFinite(+sell)||+sell<0||!Number.isInteger(+qty)||+qty<0){alert("بيانات غير صحيحة");return}p.name=name.trim();p.sell=+sell;p.barcode=barcode.trim();p.qty=+qty;persist()}
-function deleteProduct(pid){if(db.sales.some(s=>s.items.some(i=>i.pid===pid))){alert("لا يمكن حذف منتج له مبيعات مسجلة");return}if(confirm("حذف هذا المنتج؟")){db.products=db.products.filter(p=>p.id!==pid);cart=cart.filter(i=>i.pid!==pid);persist();renderCart()}}
-$("purchaseForm").onsubmit=e=>{
- e.preventDefault();let p=product($("purchaseProduct").value),qty=+$("purchaseQty").value,buy=+$("purchasePrice").value;
- if(!p||!Number.isInteger(qty)||qty<=0||!Number.isFinite(buy)||buy<0){alert("تحقق من بيانات الشراء");return}
- p.avgCost=(p.qty*p.avgCost+qty*buy)/(p.qty+qty);p.qty+=qty;
- db.purchases.push({id:id("PUR"),date:new Date().toISOString(),pid:p.id,qty,buy});e.target.reset();persist();alert("تم تسجيل الشراء");
-};
-$("finishSale").onclick=()=>{
- if(!cart.length){alert("السلة فارغة");return}
- for(let i of cart)if(!product(i.pid)||i.qty>product(i.pid).qty){alert("المخزون غير كافٍ");return}
- let sale={id:id("INV"),date:new Date().toISOString(),items:cart.map(i=>{let p=product(i.pid);return {pid:p.id,name:p.name,qty:i.qty,price:p.sell,cost:p.avgCost}})};
- sale.total=total(sale);sale.profit=profit(sale);sale.items.forEach(i=>product(i.pid).qty-=i.qty);db.sales.push(sale);cart=[];persist();renderCart();showReceipt(sale);alert("تم حفظ البيع");
-};
-function showReceipt(s){$("receipt").innerHTML=`<div class="panel"><h3>فاتورة البيع</h3><p>${safe(s.id)}</p><p>${new Date(s.date).toLocaleString("ar-IQ")}</p>${s.items.map(i=>`<p>${safe(i.name)} × ${i.qty} — ${money(i.price*i.qty)}</p>`).join("")}<hr><strong>الإجمالي: ${money(total(s))}</strong></div>`}
-function renderAll(){
- renderProducts();renderCart();
- let ds=db.sales.filter(s=>day(s)===today());
- $("todaySales").textContent=money(ds.reduce((a,s)=>a+total(s),0));
- $("todayCount").textContent=ds.length;
- $("todayProfit").textContent=money(ds.reduce((a,s)=>a+profit(s),0));
- $("productCount").textContent=db.products.length;
- $("recentSales").innerHTML=[...db.sales].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8).map(s=>`<tr><td>${safe(s.id)}</td><td>${new Date(s.date).toLocaleDateString("ar-IQ")}</td><td>${money(total(s))}</td><td>${money(profit(s))}</td></tr>`).join("")||'<tr><td colspan="4">لا توجد مبيعات</td></tr>';
- renderReport();
-}
-function renderReport(){
- let from=$("fromDate").value,to=$("toDate").value;
- let rows=[...db.sales].filter(s=>(!from||day(s)>=from)&&(!to||day(s)<=to)).sort((a,b)=>b.date.localeCompare(a.date));
- let sales=rows.reduce((a,s)=>a+total(s),0),costs=rows.reduce((a,s)=>a+cost(s),0);
- $("rSales").textContent=money(sales);$("rCost").textContent=money(costs);$("rProfit").textContent=money(sales-costs);
- $("reportRows").innerHTML=rows.map(s=>`<tr><td>${safe(s.id)}</td><td>${new Date(s.date).toLocaleString("ar-IQ")}</td><td>${money(total(s))}</td><td>${money(cost(s))}</td><td>${money(profit(s))}</td></tr>`).join("")||'<tr><td colspan="5">لا توجد مبيعات</td></tr>';
-}
-$("reportButton").onclick=renderReport;
-$("search").oninput=renderProducts;
-$("manualLookup").onclick=()=>lookup($("search").value);
-function lookup(code){
- code=String(code||"").trim();let p=db.products.find(p=>String(p.barcode||"").trim()===code);
- if(!p){alert("الباركود غير موجود. سجّله ضمن بيانات المنتج أولاً.");return}
- addCart(p.id);
-}
-$("showCamera").onclick=()=>$("cameraBox").classList.toggle("hidden");
-$("startCamera").onclick=async()=>{
- if(!navigator.mediaDevices?.getUserMedia||!("BarcodeDetector" in window)){ $("cameraStatus").textContent="المتصفح لا يدعم قارئ الكاميرا المدمج. استخدم البحث اليدوي أو متصفحاً حديثاً عبر HTTPS.";return}
- try{
-  let supported=await BarcodeDetector.getSupportedFormats();
-  let formats=["ean_13","ean_8","upc_a","upc_e","code_128","code_39"].filter(f=>supported.includes(f));
-  if(!formats.length)throw Error("لا توجد صيغ مدعومة");
-  scanner=new BarcodeDetector({formats});
-  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
-  $("video").srcObject=stream;await $("video").play();scanning=true;$("cameraStatus").textContent="وجّه الكاميرا إلى الباركود";scanFrame();
- }catch(e){stopCamera();$("cameraStatus").textContent="تعذر تشغيل الكاميرا. تحقق من إذن الكاميرا واستخدام HTTPS."}
-};
-async function scanFrame(){
- if(!scanning)return;
- try{if($("video").readyState>=2){let codes=await scanner.detect($("video"));if(codes.length){let code=codes[0].rawValue;stopCamera();$("search").value=code;lookup(code);return}}}catch(e){}
- scanTimer=setTimeout(scanFrame,250);
-}
-function stopCamera(){scanning=false;clearTimeout(scanTimer);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$("video").srcObject=null}
-$("stopCamera").onclick=stopCamera;
-$("export").onclick=()=>{
- let blob=new Blob([JSON.stringify({version:1,...db},null,2)],{type:"application/json"});
- let url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="dental-sales-backup.json";a.click();URL.revokeObjectURL(url);
-};
-$("import").onchange=async e=>{
- let f=e.target.files[0];if(!f)return;
- try{let d=JSON.parse(await f.text());if(!Array.isArray(d.products)||!Array.isArray(d.sales)||!Array.isArray(d.purchases))throw Error();if(!confirm("الاستعادة تستبدل بيانات هذا الجهاز. هل تريد المتابعة؟"))return;db={products:d.products,sales:d.sales,purchases:d.purchases};cart=[];persist();alert("تمت الاستعادة")}catch{alert("ملف النسخة الاحتياطية غير صالح")}e.target.value="";
-};
-$("fromDate").value=today().slice(0,7)+"-01";$("toDate").value=today();
-renderAll();
+$("saveProduct").onclick=()=>{let name=$("pName").value.trim(),barcode=$("pBarcode").value.trim(),sell=Number($("pSell").value),qty=Number($("pQty").value),cost=Number($("pCost").value);if(!name||!barcode||$("pSell").value===""||sell<0||!Number.isInteger(qty)||qty<0||cost<0){alert("أدخل البيانات المطلوبة بشكل صحيح");return}if(db.products.some(p=>p.barcode===barcode&&p.id!==editing)){alert("هذا الباركود مسجل لمنتج آخر");return}if(editing){let p=byId(editing);Object.assign(p,{name,barcode,sell,qty,cost})}else db.products.push({id:uid(),name,barcode,sell,qty,cost});save();resetForm();alert("تم حفظ المنتج")};
+$("resetProduct").onclick=resetForm;
+$("buy").onclick=()=>{let p=byBarcode($("buyBarcode").value.trim()),qty=Number($("buyQty").value),cost=Number($("buyCost").value);if(!p){alert("الباركود غير مسجل. أضف المنتج أولاً");return}if(!Number.isInteger(qty)||qty<1||cost<0||$("buyCost").value===""){alert("أدخل الكمية والكلفة بشكل صحيح");return}let old=Number(p.qty),oldCost=Number(p.cost||0);p.cost=((old*oldCost)+(qty*cost))/(old+qty);p.qty=old+qty;db.purchases.push({date:new Date().toISOString(),id:p.id,qty,cost});save();$("buyBarcode").value="";$("buyQty").value=1;$("buyCost").value="";alert("تمت إضافة المشتريات للمخزون")};
+$("stockBody").onclick=e=>{let ed=e.target.closest("[data-edit]"),del=e.target.closest("[data-delete]");if(ed){let p=byId(ed.dataset.edit);editing=p.id;$("pName").value=p.name;$("pBarcode").value=p.barcode;$("pSell").value=p.sell;$("pQty").value=p.qty;$("pCost").value=p.cost||0;$("saveProduct").textContent="حفظ التعديلات";document.querySelector('[data-page="products"]').click();window.scrollTo(0,0)}if(del){let p=byId(del.dataset.delete);if(p&&confirm("حذف المنتج؟")){db.products=db.products.filter(x=>x.id!==p.id);cart=cart.filter(x=>x.id!==p.id);save();renderCart()}}};
+$("export").onclick=()=>{let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="medical-sales-backup.json";a.click();URL.revokeObjectURL(url)};
+$("importBtn").onclick=()=>$("importFile").click();
+$("importFile").onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.products)||!Array.isArray(d.sales))throw Error();if(confirm("سيتم استبدال البيانات الحالية. متابعة؟")){db={products:d.products,sales:d.sales,purchases:d.purchases||[]};cart=[];save();renderCart();alert("تم الاستيراد")}}catch{alert("ملف النسخة الاحتياطية غير صالح")}e.target.value=""};r.readAsText(f)};
+$("wipe").onclick=()=>{if(confirm("حذف كل المنتجات والفواتير؟")){db=blank();cart=[];save();renderCart();$("receipt").classList.add("hidden")}};
+render();renderCart();
 </script>
 </body>
 </html>
